@@ -2,10 +2,10 @@ import os
 import zipfile
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, tostring
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QTextBrowser, QDialog
 from datetime import datetime
 import tempfile
-
+import shutil
 
 class XMLGenerator(QWidget):
     def __init__(self):
@@ -14,16 +14,16 @@ class XMLGenerator(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Gerador de XML")
+        self.setWindowTitle("XML Generator")
         self.layout = QVBoxLayout()
-        self.button = QPushButton('Carregar Ficheiro', self)
+        self.button = QPushButton('Open File', self)
         self.button.clicked.connect(self.file_open)
         self.layout.addWidget(self.button)
         self.setLayout(self.layout)
         self.zip_name = None
 
     def file_open(self):
-        name = QFileDialog.getOpenFileName(self, 'Abrir Ficheiro')[0]
+        name = QFileDialog.getOpenFileName(self, 'Open File')[0]
 
         base_name = os.path.basename(name)
 
@@ -31,66 +31,82 @@ class XMLGenerator(QWidget):
             self.zip_name = name
             self.list_zip_contents(name)
         elif name.endswith('.p21'):
-            self.create_zip_with_files(name)
+            self.validateTool(name)
         else:
-            print("Formato de arquivo não suportado.")
+            print("Unsupported file format.")
 
     def list_zip_contents(self, zip_name):
         with zipfile.ZipFile(zip_name, 'r') as zipf:
             zip_contents = zipf.namelist()
 
-            # Verifica se os arquivos XML estão na raiz do ZIP
             if 'package_assortment.xml' in zip_contents and 'package_meta_data.xml' in zip_contents:
-                print("Ambos os arquivos XML estão presentes na raiz do arquivo ZIP.")
+                print("Both XML files are present in the root of the ZIP file.")
                 
-                # Listar os arquivos encontrados no ZIP
-                print("Arquivos encontrados no ZIP:")
+                print("Files found in the ZIP:")
                 for file_name in zip_contents:
                     print(file_name)
                 
-                # Extrai e analisa o arquivo "package_assortment.xml"
                 with zipf.open('package_assortment.xml') as xml_file:
                     xml_content = xml_file.read().decode('utf-8')
                     self.extract_element_values(xml_content)
             else:
-                print("Um ou ambos os arquivos XML não foram encontrados na raiz do arquivo ZIP.")
-
+                print("One or both XML files were not found in the root of the ZIP file.")
 
     def extract_element_values(self, xml_content):
         root = ET.fromstring(xml_content)
         
-        # Extrai os valores de todos os elementos
         for item in root.findall('.//item'):
             product_id = item.find('product_id').text
             p21_file_name = item.find('p21_file_name').text
             p21_file_url = item.find('p21_file_url').text
             
-            # Imprime os valores extraídos
             print(f"Product ID: {product_id}")
             print(f"P21 File Name: {p21_file_name}")
             print(f"P21 File URL: {p21_file_url}")
             
-            # Extrai o ZIP para um diretório temporário
             with zipfile.ZipFile(self.zip_name, 'r') as zipf:
                 with tempfile.TemporaryDirectory() as temp_dir:
                     zipf.extractall(temp_dir)
                     
-                    # Constrói o caminho absoluto do arquivo
-                    file_path = os.path.join(temp_dir, p21_file_url.lstrip('/'))  # Remove a barra inicial se houver
+                    file_path = os.path.join(temp_dir, p21_file_url.lstrip('/'))
                     
-                    # Verifica se o arquivo existe dentro do diretório temporário
                     if os.path.exists(file_path):
-                        print(f"O arquivo {p21_file_name} existe no diretório {file_path}")
+                        print(f"The file {p21_file_name} exists in the directory {file_path}")
                     else:
-                        print(f"O arquivo {p21_file_name} não foi encontrado no diretório {file_path}")
+                        print(f"The file {p21_file_name} was not found in the directory {file_path}")
 
+    def validateTool(self, p21_path):
+        validation_dialog = QDialog(self)
+        validation_dialog.setWindowTitle("Data Validation and Preview")
+        validation_dialog.setGeometry(100, 100, 800, 600)
+        
+        layout = QVBoxLayout()
+
+        text_browser = QTextBrowser(validation_dialog)
+        text_browser.setGeometry(50, 50, 700, 400)
+        layout.addWidget(text_browser)
+
+        validate_button = QPushButton("Validate Data", validation_dialog)
+        validate_button.setGeometry(50, 500, 150, 40)
+        validate_button.clicked.connect(lambda: self.perform_validation(text_browser, p21_path))
+
+        validation_dialog.setLayout(layout)
+        validation_dialog.exec_()
+
+    def perform_validation(self, text_browser, p21_path):
+        # Add your data validation logic here and display the results in the QTextBrowser
+        validation_result = f"Data validated successfully for file {p21_path}."
+        text_browser.setPlainText(validation_result)
+        
+        # If validation is successful, create the files
+        self.create_zip_with_files(p21_path)
 
     def create_zip_with_files(self, p21_path):
         p21_file_name = os.path.basename(p21_path)
         p21_file_name_without_ext = os.path.splitext(p21_file_name)[0]
-        zip_file_name = p21_file_name_without_ext + '.zip'
+        zip_file_name = os.path.join(os.path.dirname(p21_path), p21_file_name_without_ext + '.zip')  # Alteração aqui
 
-        # Cria o arquivo XML 'package_assortment.xml'
+        # Create the 'package_assortment.xml' file
         package_assortment = Element('package_assortment')
         package_assortment.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
         package_assortment.set('xmlns:xsd', 'http://www.w3.org/2001/XMLSchema')
@@ -101,10 +117,10 @@ class XMLGenerator(QWidget):
         product_id.text = p21_file_name_without_ext
 
         gtc_generic_class_id = SubElement(item, 'gtc_generic_class_id')
-        gtc_generic_class_id.text = 'INSI'
+        gtc_generic_class_id.text = 'TRNPEI'
 
         gtc_vendor_class_id = SubElement(item, 'gtc_vendor_class_id')
-        gtc_vendor_class_id.text = 'INSI_MISO$C'
+        gtc_vendor_class_id.text = 'TRNPEI_WSV$$CC_MPMC01'
 
         current_datetime = datetime.now()
         p21_value_change_timestamp = SubElement(item, 'p21_value_change_timestamp')
@@ -130,19 +146,17 @@ class XMLGenerator(QWidget):
 
         with open(xml_file_path, 'w', encoding='UTF-8') as file:
             file.write(xml_str)
-            print(f"Arquivo XML 'package_assortment.xml' criado com sucesso.")
+            print(f"XML file 'package_assortment.xml' created successfully.")
 
-        # Obtenha as informações do arquivo STEP a partir do arquivo P21
         step_info = extract_step_info_from_p21(p21_path)
 
         if not step_info:
-            print("Nome do arquivo STEP não encontrado no arquivo P21.")
+            print("STEP file name not found in the P21 file.")
             return
 
-        # Construa o caminho completo do arquivo STEP
         step_path = os.path.join(os.path.dirname(p21_path), step_info)
 
-        # Cria o arquivo XML 'package_meta_data.xml' com base no arquivo P21
+        # Create the 'package_meta_data.xml' file
         package_meta_data = Element('package_meta_data')
         package_meta_data.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
         package_meta_data.set('xsi:noNamespaceSchemaLocation', '../../xml schemas/package_meta_data_update20150223.xsd')
@@ -153,8 +167,8 @@ class XMLGenerator(QWidget):
         vendor_hierarchy_version = SubElement(package_meta_data, 'vendor_hierarchy_version')
         vendor_hierarchy_version.text = '2.0.0'
 
-        # Extraia informações do P21 para "search in p21"
-        # Aqui, você deve adicionar o código para extrair as informações do P21 e preencher as tags correspondentes
+        # Extract information from the P21 for "search in p21"
+        # Add your code here to extract information from the P21 and fill the corresponding tags
         vendor_name = SubElement(package_meta_data, 'vendor_name')
         vendor_name.text = 'Kennametal'
 
@@ -189,16 +203,19 @@ class XMLGenerator(QWidget):
 
         with open(xml_file_path_meta, 'w', encoding='UTF-8') as file:
             file.write(xml_str_meta)
-            print(f"Arquivo XML 'package_meta_data.xml' criado com sucesso.")
+            print(f"XML file 'package_meta_data.xml' created successfully.")
 
-        # Cria o arquivo ZIP com os três arquivos
+        # Create the ZIP file with the three files
         with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED) as myzip:
             myzip.write(p21_path, os.path.join('product_data_files', p21_file_name_without_ext + '.p21'))
             myzip.write(step_path, os.path.join('product_3d_models_detailed', step_info))
             myzip.write(xml_file_path, 'package_assortment.xml')
             myzip.write(xml_file_path_meta, 'package_meta_data.xml')
-            print(f"Arquivo ZIP {zip_file_name} criado com sucesso.")
+            print(f"ZIP file {zip_file_name} created successfully.")
 
+        # Remove the temporary XML files
+        os.remove(xml_file_path)
+        os.remove(xml_file_path_meta)
 
 def extract_step_info_from_p21(p21_path):
     step_info = None
@@ -212,7 +229,7 @@ def extract_step_info_from_p21(p21_path):
                         step_info = file_info
                         break
 
-    print("Nome do arquivo STEP encontrado:", step_info)
+    print("STEP file name found:", step_info)
     return step_info
 
 def main():

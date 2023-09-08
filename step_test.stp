@@ -1,0 +1,10 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('Example STEP file','v1.0'),'2;1');
+FILE_NAME('step_test.stp','2023-09-08T13:40:44','',('me','myself'),(''),'','me');
+FILE_SCHEMA(('NONE'));
+ENDSEC;
+DATA;
+#1=APPLICATION('MyApp','v1.0');
+ENDSEC;
+END-ISO-10303-21;
