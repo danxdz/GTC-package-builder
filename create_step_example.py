@@ -1,4 +1,6 @@
+from xml.etree.ElementTree import ParseError
 from steputils import p21
+
 
 FNAME = "step_test.stp"
 
@@ -15,6 +17,8 @@ data.add(p21.simple_instance('#1', name='APPLICATION', params=('MyApp', 'v1.0'))
 stepfile.header.set_file_description(('Example STEP file', 'v1.0'))
 stepfile.header.set_file_name(name=FNAME, organization=('me', 'myself'), autorization='me')
 stepfile.header.set_file_schema(('NONE',))
+
+stepfile.new_data_section("#123","oipi")
 
 # Write STEP-file to file system:
 stepfile.save(FNAME)

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package_meta_data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../xml%20schemas/package_meta_data_update20150223.xsd">
+	<supported_gtc_generic_versions>1.10</supported_gtc_generic_versions>
+	<vendor_hierarchy_version>1.0</vendor_hierarchy_version>
+	<vendor_name>MachiningCloud</vendor_name>
+	<vendor_acronym>MCD</vendor_acronym>
+	<gtc_package_creation_date>2023-09-05T11:03:28Z</gtc_package_creation_date>
+	<gtc_package_id>MC_20230905110328</gtc_package_id>
+	<logo_url>/package_logo.png</logo_url>
+	<language>
+		<language_code>eng</language_code>
+		<short_description>Package 'Tool 1.zip' from MachiningCloud</short_description>
+		<long_description>This package includes the hierarchy and product data provided by MachiningCloud</long_description>
+		<disclaimer_url>./disclaimer/en-us/disclaimer_en.txt</disclaimer_url>
+	</language>
+</package_meta_data>

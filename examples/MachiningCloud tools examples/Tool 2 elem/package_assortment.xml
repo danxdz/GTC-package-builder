@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Copyright © MachiningCloud, Inc. 2023-->
+<package_assortment>
+	<item>
+		<product_id>Tool 1_39265917</product_id>
+		<gtc_generic_class_id />
+		<gtc_vendor_class_id />
+		<p21_value_change_timestamp>2023-09-05T11:03:28</p21_value_change_timestamp>
+		<p21_structure_change_timestamp>0001-01-01T00:00:00</p21_structure_change_timestamp>
+		<p21_file_name>Tool 1_39265917.p21</p21_file_name>
+		<p21_file_url>product_data_files\Tool 1_39265917.p21</p21_file_url>
+		<gtc_generic_version />
+		<unit_system>metric</unit_system>
+	</item>
+	<item>
+		<product_id>Seco_02752981</product_id>
+		<gtc_generic_class_id>ADPRS</gtc_generic_class_id>
+		<gtc_vendor_class_id>ADPRS_MTAP</gtc_vendor_class_id>
+		<p21_value_change_timestamp>2023-09-05T11:03:28</p21_value_change_timestamp>
+		<p21_structure_change_timestamp>0001-01-01T00:00:00</p21_structure_change_timestamp>
+		<p21_file_name>Seco_02752981.p21</p21_file_name>
+		<p21_file_url>product_data_files\Seco_02752981.p21</p21_file_url>
+		<gtc_generic_version>1.10</gtc_generic_version>
+		<unit_system>metric</unit_system>
+	</item>
+</package_assortment>

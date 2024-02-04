@@ -1,0 +1,13 @@
+DISCLAIMER
+
+By downloading MachiningCloud's data (models, properties and information) you agree to the following. 
+
+The data is provided "as is" and does not create any warranty whatsoever, whether expressed, implied, statutory or arising from trade usage or practice and, without limiting the foregoing, no warranty of fitness for specific or general purpose or merchantability is granted or deemed granted. MachiningCloud accepts no liability whatsoever for any defect, error or imperfection in the data. 
+ 
+The data may be changed, deleted or modified without notice. 
+
+The data may be subject to export restrictions according to applicable laws and regulations within the EU, the USA and in the country where such data may be used. You are responsible for complying with such laws and regulations and for obtaining all required licenses to export, re-export and/or import such data. 
+
+If you do not accept these terms, do not open or save any of the graphic files. 
+
+You are reminded that by accessing the MachiningCloud website you have also agreed to the terms of the Legal Notice.
